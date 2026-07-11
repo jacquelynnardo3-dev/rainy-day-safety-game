@@ -1,0 +1,283 @@
+/* ============================================
+   MOBILE.CSS - Complete Layout Fix
+   ============================================ */
+
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* prevent scrolling if it's a slide-based app */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #1a2a3a; /* your dark blue background */
+  color: #fff;
+}
+
+/* Main App Container - fills entire screen */
+.app-container,
+#app,
+main,
+.game-container {
+  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height for mobile browsers */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ============================================
+   TOP BAR (Chapter title, stars, locks)
+   FIXED — no longer absolute, sits in normal flow
+   ============================================ */
+.top-bar,
+.header,
+.chapter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0; /* prevents bar from shrinking */
+  min-height: 56px;
+  z-index: 10;
+}
+
+.chapter-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stars-locks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.star-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.locked-levels {
+  display: flex;
+  gap: 6px;
+}
+
+.lock-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   IMAGE AREA (School hallway illustration)
+   ============================================ */
+.image-section,
+.illustration-container,
+.scene {
+  flex: 1; /* takes all available space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 16px 16px; /* top padding for the absolute header */
+  width: 100%;
+}
+
+.scene-image,
+.illustration,
+.story-image {
+  max-width: 100%;
+  max-height: 45vh; /* limits image so it doesn't push button off screen */
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* ============================================
+   BOTTOM AREA (Next button)
+   ============================================ */
+.bottom-bar,
+.controls,
+.action-area {
+  padding: 16px 24px 32px; /* extra bottom padding for safe area */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The Next Button */
+.next-btn,
+.btn-next,
+button.next {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #2b6cb0, #2c5282);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.next-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   SAFE AREA SUPPORT (notch phones)
+   ============================================ */
+@supports (padding: max(0px)) {
+  .top-bar {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+  
+  .bottom-bar {
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
+  }
+}
+
+/* ============================================
+   SMALL SCREENS
+   ============================================ */
+@media (max-height: 700px) {
+  .scene-image {
+    max-height: 38vh;
+  }
+  
+  .next-btn {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+/* ============================================
+   ROTATION PROMPT - Show in portrait only
+   ============================================ */
+#rotate-prompt {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #0d1b2a;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+#rotate-prompt .rotate-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  animation: rotatePhone 2s ease-in-out infinite;
+}
+
+@keyframes rotatePhone {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+}
+
+@media screen and (orientation: portrait) {
+  #rotate-prompt {
+    display: flex !important;
+  }
+  body > *:not(#rotate-prompt) {
+    display: none !important;
+  }
+}
+/* ============================================
+   LANDSCAPE SPLIT LAYOUT (like your screenshot)
+   ============================================ */
+@media screen and (orientation: landscape) and (max-width: 768px) {
+  #game-container {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  /* Left side - illustration */
+  .scene-container,
+  .image-section {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+  
+  .scene-image,
+  #game-scene-art {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  
+  /* Right side - story + choices */
+  #story-container,
+  .story-panel {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(13, 27, 42, 0.95);
+  }
+  
+  #story-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #e67e22; /* orange text like screenshot */
+  }
+  
+  /* Choice buttons stack vertically */
+  #action-panel,
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .choice-btn {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    text-align: center;
+    line-height: 1.3;
+  }
+}

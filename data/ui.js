@@ -1,0 +1,670 @@
+// ============================================
+// LANDSCAPE ORIENTATION LOCK
+// ============================================
+
+function lockLandscape() {
+  // Method 1: Screen Orientation API (modern browsers)
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch((err) => {
+      console.log('Orientation lock not supported:', err);
+    });
+  }
+  
+  // Method 2: iOS fallback
+  if (window.orientation !== undefined) {
+    window.addEventListener('orientationchange', () => {
+      if (window.orientation === 0 || window.orientation === 180) {
+        // Portrait detected - show rotate prompt
+        showRotatePrompt();
+      } else {
+        hideRotatePrompt();
+      }
+    });
+  }
+}
+
+function showRotatePrompt() {
+  let prompt = document.getElementById('rotate-prompt');
+  if (!prompt) {
+    prompt = document.createElement('div');
+    prompt.id = 'rotate-prompt';
+    prompt.innerHTML = `
+      <div style="
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #0d1b2a; z-index: 99999; display: flex;
+        flex-direction: column; align-items: center; justify-content: center;
+        color: white; font-family: sans-serif; text-align: center; padding: 20px;
+      ">
+        <div style="font-size: 4rem; margin-bottom: 20px;">📱↪️</div>
+        <h2 style="margin: 0 0 10px 0;">Please Rotate Your Device</h2>
+        <p style="margin: 0; opacity: 0.8;">This game works best in landscape mode</p>
+      </div>
+    `;
+    document.body.appendChild(prompt);
+  }
+  prompt.style.display = 'flex';
+}
+
+function hideRotatePrompt() {
+  const prompt = document.getElementById('rotate-prompt');
+  if (prompt) prompt.style.display = 'none';
+}
+
+// Lock on load and when game starts
+document.addEventListener('DOMContentLoaded', () => {
+  lockLandscape();
+  // Also re-lock when user interacts (some browsers require user gesture)
+  document.addEventListener('click', () => {
+    lockLandscape();
+  }, { once: true });
+});
+// data/ui.js
+const DIALOGUE_TYPING_SPEED = 18; 
+const ENABLE_DIALOGUE_ANIMATION = true; 
+
+let dialogueAnimationTracker = {
+    timerId: null,
+    fullText: "",
+    currentIdx: 0,
+    isAnimating: false,
+    onCompleteCallback: null
+};
+
+function updateUI() {
+    const currentNode = storyData[gameState.currentId];
+    if (!currentNode) return;
+
+    const artImage = document.getElementById("game-scene-art");
+    const placeholder = document.getElementById("art-placeholder");
+    
+    if (currentNode.imagePath) {
+        artImage.src = currentNode.imagePath;
+        artImage.classList.remove("hidden");
+        if (placeholder) placeholder.classList.add("hidden");
+        
+        artImage.onerror = () => {
+            artImage.classList.add("hidden");
+            if (placeholder) {
+                placeholder.classList.remove("hidden");
+                placeholder.innerText = `🎨 Art Panel: ${currentNode.imagePath}`;
+            }
+        };
+    }
+
+    document.getElementById("chapter-title").innerText = currentNode.title;
+    document.getElementById("star-count").innerText = gameState.score;
+    document.getElementById("story-text").innerText = currentNode.text;
+
+    const targetStoryTextEl = document.getElementById("story-text");
+    const choicesContainer = document.getElementById("choices-container");
+    const gridContainer = document.getElementById("interactive-grid-container");
+    const hazardLayer = document.getElementById("hazard-interactive-layer");
+    
+    choicesContainer.innerHTML = "";
+    choicesContainer.classList.add("hidden");
+    gridContainer.classList.add("hidden");
+    if (hazardLayer) hazardLayer.classList.add("hidden");
+    document.getElementById("backpack-overlay-container").innerHTML = "";
+    cancelActiveTypingAnimation();
+
+    const postRevealAction = () => {
+        if (currentNode.type === "story") {
+            choicesContainer.classList.remove("hidden");
+            const nextBtn = document.createElement("button");
+            nextBtn.className = "choice-btn";
+            nextBtn.innerText = "Next ▶";
+            nextBtn.onclick = () => {
+                AudioManager.playSFX('next');
+                advanceStory();
+            };
+            choicesContainer.appendChild(nextBtn);
+        } else if (currentNode.type === "choice") {
+            choicesContainer.classList.remove("hidden");
+            currentNode.choices.forEach(choice => {
+                const btn = document.createElement("button");
+                btn.className = "choice-btn";
+                btn.innerText = choice.text;
+                
+                if (choice.nextId === "start") {
+                    btn.onclick = () => {
+                        AudioManager.playSFX('back');
+                        initGame();
+                    };
+                } else if (choice.requiredItem && !gameState.inventory.includes(choice.requiredItem)) {
+                    btn.disabled = true;
+                    btn.style.opacity = "0.4";
+                    btn.style.cursor = "not-allowed";
+                } else {
+                    btn.onclick = () => {
+                        AudioManager.playSFX('next');
+                        handleChoice(choice);
+                    };
+                }
+                choicesContainer.appendChild(btn);
+            });
+        } else if (currentNode.type === "minigame") {
+            if (gameState.currentId === "hazard_game") {
+                hazardLayer.classList.remove("hidden");
+                setupHazardPlayground();
+            } else {
+                if (gameState.currentId === "home_kit_game") {
+                    miniGameItems = allMiniGameItems.home;
+                    document.querySelector(".grid-instructions").innerText = "🏡 Click 3 items to secure your home:";
+                } else {
+                    miniGameItems = allMiniGameItems.school;
+                    document.querySelector(".grid-instructions").innerText = "🎒 Click 3 items to pack your bag:";
+                }
+                gridContainer.classList.remove("hidden");
+                setupItemsGrid();
+            }
+        }
+    };
+
+    if (ENABLE_DIALOGUE_ANIMATION && (currentNode.type === "story" || currentNode.type === "choice" || currentNode.type === "minigame")) {
+        triggerDialogueTypewriter(targetStoryTextEl, currentNode.text, postRevealAction);
+    } else {
+        targetStoryTextEl.innerText = currentNode.text;
+        postRevealAction();
+    }
+}
+
+function triggerDialogueTypewriter(element, textString, callback) {
+    cancelActiveTypingAnimation();
+    dialogueAnimationTracker.fullText = textString;
+    dialogueAnimationTracker.currentIdx = 0;
+    dialogueAnimationTracker.isAnimating = true;
+    dialogueAnimationTracker.onCompleteCallback = callback;
+    element.innerHTML = "";
+    
+    function typeNextCharacter() {
+        if (!dialogueAnimationTracker.isAnimating) return;
+        if (dialogueAnimationTracker.currentIdx <= dialogueAnimationTracker.fullText.length) {
+            const revealedChunk = dialogueAnimationTracker.fullText.substring(0, dialogueAnimationTracker.currentIdx);
+            const hiddenChunk = dialogueAnimationTracker.fullText.substring(dialogueAnimationTracker.currentIdx);
+            element.innerHTML = `${escapeHTMLSymbols(revealedChunk)}<span style="opacity: 0; user-select: none;">${escapeHTMLSymbols(hiddenChunk)}</span>`;
+            
+            dialogueAnimationTracker.currentIdx++;
+            dialogueAnimationTracker.timerId = setTimeout(typeNextCharacter, DIALOGUE_TYPING_SPEED);
+        } else {
+            finalizeDialogueReveal(element);
+        }
+    }
+
+    typeNextCharacter();
+}
+
+function finalizeDialogueReveal(element) {
+    if (!dialogueAnimationTracker.isAnimating) return;
+    
+    cancelActiveTypingAnimation();
+    element.innerHTML = escapeHTMLSymbols(dialogueAnimationTracker.fullText);
+    
+    if (dialogueAnimationTracker.onCompleteCallback) {
+        dialogueAnimationTracker.onCompleteCallback();
+        dialogueAnimationTracker.onCompleteCallback = null;
+    }
+}
+
+function skipActiveDialogueReveal() {
+    const textEl = document.getElementById("story-text");
+    if (dialogueAnimationTracker.isAnimating && textEl) {
+        finalizeDialogueReveal(textEl);
+        return true;
+    }
+    return false;
+}
+
+function cancelActiveTypingAnimation() {
+    if (dialogueAnimationTracker.timerId) {
+        clearTimeout(dialogueAnimationTracker.timerId);
+        dialogueAnimationTracker.timerId = null;
+    }
+    dialogueAnimationTracker.isAnimating = false;
+}
+
+function escapeHTMLSymbols(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const textFrameBox = document.getElementById("action-panel") || document.getElementById("story-container");
+    if (textFrameBox) {
+        textFrameBox.addEventListener("click", (e) => {
+            if (e.target.classList.contains("choice-btn") || e.target.closest("#interactive-grid-container") || e.target.closest("#hazard-interactive-layer")) return;
+            skipActiveDialogueReveal();
+        });
+    }
+
+    window.addEventListener("keydown", (event) => {
+        if (event.key === " " || event.key === "Enter") {
+            const didSkip = skipActiveDialogueReveal();
+            if (didSkip) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        }
+    }, true);
+});
+
+function setupItemsGrid() {
+    const grid = document.getElementById("items-grid");
+    grid.innerHTML = "";
+    miniGameItems.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "grid-item";
+        
+        if (gameState.selectedItems.some(i => i.id === item.id)) {
+            itemDiv.classList.add("selected");
+        }
+        
+        itemDiv.innerHTML = `
+            <img src="${item.imagePath}" onerror="this.style.display='none';" alt="${item.name}">
+            <div class="emoji-fallback" style="font-size:1.6rem;">${item.icon}</div>
+            <h3>${item.name}</h3>
+        `;
+        
+        itemDiv.addEventListener("click", () => {
+            AudioManager.playSFX('next');
+            const index = gameState.selectedItems.findIndex(i => i.id === item.id);
+            if (index > -1) {
+                 gameState.selectedItems.splice(index, 1);
+            } else {
+                if (gameState.selectedItems.length >= 3) return;
+                gameState.selectedItems.push(item);
+            }
+            
+            setupItemsGrid(); 
+            updateGridUI();
+        });
+        
+        grid.appendChild(itemDiv);
+    });
+    
+    updateGridUI();
+}
+
+function updateGridUI() {
+    document.getElementById("packed-count").innerText = gameState.selectedItems.length;
+    const submitBtn = document.getElementById("submit-grid-btn");
+    if (gameState.selectedItems.length === 3) {
+        submitBtn.removeAttribute("disabled");
+        submitBtn.style.opacity = "1";
+    } else {
+        submitBtn.setAttribute("disabled", "true");
+        submitBtn.style.opacity = "0.5";
+    }
+
+    const artOverlay = document.getElementById("backpack-overlay-container");
+    artOverlay.innerHTML = "";
+    gameState.selectedItems.forEach(item => {
+        const itemSticker = document.createElement("div");
+        itemSticker.className = "overlay-packed-item";
+        itemSticker.innerText = item.icon;
+        artOverlay.appendChild(itemSticker);
+    });
+}
+
+function setupHazardPlayground() {
+    const hazardLayer = document.getElementById("hazard-interactive-layer");
+    hazardLayer.innerHTML = "";
+    if (gameState.selectedItems.length === 0 && !hazardLayer.dataset.listening) {
+        gameState.hazardTries = 0;
+        hazardLayer.dataset.listening = "true";
+        hazardLayer.addEventListener("click", (e) => {
+            if (e.target.classList.contains("hazard-hitbox")) return;
+            
+            gameState.hazardTries++;
+            AudioManager.playSFX('back');
+            
+            if (gameState.hazardTries >= 5) {
+                delete hazardLayer.dataset.listening;
+                gameState.selectedItems = [];
+                gameState.currentId = "hazard_failure_scene";
+                
+                // Triggers structural failure prompt
+                AudioManager.playSFX('modal_negative');
+                showFeedbackModal("Too Many Mistakes!", "You ran out of inspection attempts! Walking blindly around storm damage can result in accidents.", false);
+                updateUI();
+            } else {
+                 showFeedbackModal("Careful!", `That spot is safe, but keep looking! Attempts left: ${5 - gameState.hazardTries}`, false);
+            }
+        });
+    }
+
+    const hazards = allMiniGameItems.aftermath.filter(item => item.isCorrect);
+    const coordinates = {
+        "cord":   { top: 52, left: 0, width: 32, height: 32 },
+        "wetfood": { top: 64, left: 44, width: 44, height: 12},
+        "debris":  { top: 72, left: 73, width: 35, height: 20 }
+    };
+    hazards.forEach(hazard => {
+        const coord = coordinates[hazard.id];
+        if (!coord) return;
+
+        const hitbox = document.createElement("button");
+        hitbox.className = "hazard-hitbox";
+        hitbox.style.top = coord.top + "%";
+        hitbox.style.left = coord.left + "%";
+        hitbox.style.width = coord.width + "%";
+        hitbox.style.height = coord.height + "%";
+
+        const alreadyFound = gameState.selectedItems.some(item => item.id === hazard.id);
+        if (alreadyFound) {
+            drawVisualFeedback(hazardLayer, coord, hazard.name);
+            hitbox.style.pointerEvents = "none";
+        }
+
+        hitbox.addEventListener("click", (e) => {
+            e.stopPropagation(); 
+            AudioManager.playSFX('next');
+            gameState.selectedItems.push(hazard);
+            hitbox.style.pointerEvents = "none";
+
+            drawVisualFeedback(hazardLayer, coord, hazard.name);
+            if (gameState.selectedItems.length === 3) {
+                delete hazardLayer.dataset.listening;
+                setTimeout(() => {
+                    submitPackChallenge();
+                }, 1400);
+            }
+        });
+
+        hazardLayer.appendChild(hitbox);
+    });
+}
+
+function drawVisualFeedback(parent, coord, hazardName) {
+    const centerLeft = (coord.left + (coord.width / 2)) + "%";
+    const centerTop = (coord.top + (coord.height / 2)) + "%";
+
+    const circle = document.createElement("div");
+    circle.className = "hazard-paint-circle";
+    circle.style.left = centerLeft;
+    circle.style.top = centerTop;
+    circle.style.width = coord.width + "%"; 
+    circle.style.height = coord.width + "%";
+    const label = document.createElement("div");
+    label.className = "hazard-pop-label";
+    label.style.left = centerLeft;
+    label.style.top = centerTop;
+    label.innerText = "⚠️ " + hazardName;
+
+    parent.appendChild(circle);
+    parent.appendChild(label);
+}
+
+function positionStoryContainer() {
+    const storyEl = document.getElementById("story-container");
+    const actionEl = document.getElementById("action-panel");
+    const isHazardScene = gameState.currentId === "hazard_game";
+
+    if (isHazardScene) {
+        // Task 2: hide action panel, push story to top
+        actionEl.classList.add("action-panel--hidden");
+        storyEl.classList.add("story-top-mode");
+        storyEl.style.bottom = "";
+    } else {
+        // Task 1: restore action panel, position story just above it
+        actionEl.classList.remove("action-panel--hidden");
+        storyEl.classList.remove("story-top-mode");
+        storyEl.style.top = "";
+        const actionHeight = actionEl.offsetHeight;
+        storyEl.style.bottom = (actionHeight + 12) + "px";
+    }
+}
+
+function showFeedbackModal(title, text, isPositive) {
+    const modal = document.getElementById("feedback-modal");
+    document.getElementById("modal-title").innerText = title;
+    document.getElementById("modal-text").innerText = text;
+    document.getElementById("modal-icon").innerText = isPositive ? "⭐" : "⚠️";
+    document.getElementById("modal-title").style.color = isPositive ? "var(--safe-green)" : "var(--danger-red)";
+    modal.classList.remove("hidden");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("modal-close-btn").addEventListener("click", () => {
+        AudioManager.playSFX('back');
+        document.getElementById("feedback-modal").classList.add("hidden");
+    });
+});
+
+function showMainMenu() {
+    document.getElementById("main-menu-overlay").classList.remove("hidden");
+    document.getElementById("leaderboard-view").classList.add("hidden");
+    document.getElementById("menu-home-screen").classList.remove("hidden");
+}
+
+function openLeaderboard() {
+    document.getElementById("menu-home-screen").classList.add("hidden");
+    const container = document.getElementById("leaderboard-view");
+    container.classList.remove("hidden");
+
+    const listElement = document.getElementById("leaderboard-rows");
+    listElement.innerHTML = "";
+
+    const entries = LeaderboardSystem.getEntries();
+    if (entries.length === 0) {
+        listElement.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px;">No heroes logged today yet. Be the first! 🌟</td></tr>`;
+        return;
+    }
+
+    entries.forEach((entry, index) => {
+        const row = document.createElement("tr");
+        const formattedDate = new Date(entry.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td><strong>${entry.name}</strong></td>
+            <td>⭐ ${entry.score}</td>
+            <td>${formattedDate}</td>
+        `;
+        listElement.appendChild(row);
+    });
+}
+
+function handlePlayClick() {
+    const inputElement = document.getElementById("hero-name-input");
+    const errorBubble = document.getElementById("name-validation-error");
+    
+    inputElement.value = "";
+    errorBubble.classList.add("hidden");
+
+    document.getElementById("menu-home-screen").classList.add("hidden");
+    document.getElementById("leaderboard-view").classList.add("hidden");
+    const nameModal = document.getElementById("name-prompt-modal");
+    nameModal.classList.remove("hidden");
+    
+    setTimeout(() => inputElement.focus(), 50);
+}
+
+function dismissNameModal() {
+    document.getElementById("name-prompt-modal").classList.add("hidden");
+    document.getElementById("menu-home-screen").classList.remove("hidden");
+}
+
+function validateAndSubmitName() {
+    const inputElement = document.getElementById("hero-name-input");
+    const errorBubble = document.getElementById("name-validation-error");
+    
+    const sanitizedName = inputElement.value.trim();
+    if (!sanitizedName) {
+        AudioManager.playSFX('back');
+        errorBubble.classList.remove("hidden");
+        errorBubble.style.animation = 'none';
+        errorBubble.offsetHeight;
+        errorBubble.style.animation = '';
+        inputElement.focus();
+        return;
+    }
+
+    gameState.playerName = sanitizedName;
+    document.getElementById("name-prompt-modal").classList.add("hidden");
+    AudioManager.playMusic('gameplay');
+    initGame(true);
+}
+
+const originalUpdateUI = updateUI;
+updateUI = function() {
+    originalUpdateUI();
+    
+    const currentId = gameState.currentId;
+    const choicesContainer = document.getElementById("choices-container");
+    const isVictory = (currentId === "victory_ending" || currentId === "bad_reflection_ending");
+    const isGameOver = (currentId === "bad_ending_summary" || currentId === "hazard_failure_scene");
+    
+    if (isVictory || isGameOver) {
+        const clearAndRenderButtons = () => {
+            choicesContainer.innerHTML = "";
+            if (isGameOver) {
+                // Immediate music pause followed by dedicated melancholy melody loop
+                AudioManager.stopMusic(false); 
+                AudioManager.playSFX('gameover');
+
+                const retryBtn = document.createElement("button");
+                retryBtn.className = "choice-btn";
+                retryBtn.innerText = "Try Again (Choose Safely!)";
+                retryBtn.onclick = () => {
+                    AudioManager.playSFX('next');
+                    AudioManager.playMusic('gameplay');
+                    initGame(true);
+                };
+                choicesContainer.appendChild(retryBtn);
+            } else if (isVictory) {
+                AudioManager.playSFX('victory');
+                const qualified = LeaderboardSystem.qualifiesForTop20(gameState.score);
+                const extraMsg = qualified 
+                    ? "\n\n🎉 Congratulations! You made it into today's Top 20 Flood Safety Heroes!" 
+                    : "";
+                if (gameState.score >= 120) {
+                    document.getElementById("story-text").innerText = `🌟 PERFECT RUN!\nYour final score is ${gameState.score} Stars.\nYou packed flawlessly, handled home hazards, protected your family, and shared resources with Leo.\nYou are a Certified Master Disaster Hero!${extraMsg}`;
+                } else {
+                    document.getElementById("story-text").innerText = `👍 SURVIVAL HERO!\nYour final score is ${gameState.score} Stars.\nYou navigated the challenges, made it through safely, and contributed your experience back to the class.${extraMsg}`;
+                }
+
+                const nodeChoices = storyData[currentId].choices || [];
+                nodeChoices.forEach(choice => {
+                    const btn = document.createElement("button");
+                    btn.className = "choice-btn";
+                    btn.innerText = choice.text;
+                    btn.onclick = () => {
+                        AudioManager.playSFX('next');
+                        if (choice.nextId === "start") {
+                            AudioManager.playMusic('gameplay');
+                            initGame(true);
+                        } else {
+                            handleChoice(choice);
+                        }
+                     };
+                    choicesContainer.appendChild(btn);
+                });
+            }
+
+            const mainMenuBtn = document.createElement("button");
+            mainMenuBtn.className = "choice-btn menu-return-btn";
+            mainMenuBtn.innerText = "🏠 Return to Main Menu";
+            mainMenuBtn.onclick = () => {
+                AudioManager.playSFX('back');
+                AudioManager.playMusic('mainMenu');
+                if (typeof LeaderboardSystem !== 'undefined') {
+                    LeaderboardSystem.submitScore(gameState.playerName, gameState.score);
+                }
+                initGame(false); 
+            };
+            choicesContainer.appendChild(mainMenuBtn);
+            choicesContainer.classList.remove("hidden");
+        };
+
+        if (dialogueAnimationTracker.isAnimating) {
+            dialogueAnimationTracker.onCompleteCallback = clearAndRenderButtons;
+        } else {
+            clearAndRenderButtons();
+        }
+    }
+
+    positionStoryContainer();
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("btn-menu-play").onclick = () => {
+        AudioManager.playSFX('next');
+        handlePlayClick();
+    };
+    document.getElementById("btn-menu-leaderboard").onclick = () => {
+        AudioManager.playSFX('next');
+        openLeaderboard();
+    };
+    document.getElementById("btn-menu-back").onclick = () => {
+        AudioManager.playSFX('back');
+        showMainMenu();
+    };
+    document.getElementById("btn-modal-start").onclick = () => {
+        AudioManager.playSFX('next');
+        validateAndSubmitName();
+    };
+    document.getElementById("btn-modal-cancel").onclick = () => {
+        AudioManager.playSFX('back');
+        dismissNameModal();
+    };
+    document.getElementById("name-prompt-modal").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            AudioManager.playSFX('next');
+            validateAndSubmitName();
+        } else if (event.key === "Escape") {
+            event.preventDefault();
+            AudioManager.playSFX('back');
+            dismissNameModal();
+        }
+    });
+    document.getElementById("submit-grid-btn").onclick = () => {
+        submitPackChallenge();
+    };
+
+    // Main Menu top-right rounded corner audio toggle trigger
+    const musicToggleBtn = document.getElementById("btn-toggle-music");
+    if (musicToggleBtn) {
+        musicToggleBtn.onclick = () => {
+            AudioManager.playSFX('next');
+            var stateCheck = AudioManager.toggleMuteMusic();
+            
+            if (musicToggleBtn.innerText.includes("Mute")) {
+                musicToggleBtn.innerText = "🔊 Unmute Music";
+            } else {
+                musicToggleBtn.innerText = "🎵 Mute Music";
+            }
+        };
+    }
+    const actionPanelEl = document.getElementById("action-panel");
+    if (actionPanelEl && window.ResizeObserver) {
+        new ResizeObserver(() => positionStoryContainer()).observe(actionPanelEl);
+    }
+        // === MOBILE FIX - Override positionStoryContainer ===
+    (function() {
+        if (window.innerWidth > 768) return;
+        
+        const originalPositionStory = positionStoryContainer;
+        
+        positionStoryContainer = function() {
+            if (window.innerWidth > 768) {
+                originalPositionStory();
+                return;
+            }
+            
+            const storyEl = document.getElementById("story-container");
+            const actionEl = document.getElementById("action-panel");
+            
+            if (!storyEl || !actionEl) return;
+            
+            storyEl.style.top = "";
+            storyEl.style.bottom = "";
+            storyEl.style.position = "";
+            storyEl.style.left = "";
+            storyEl.style.right = "";
+            storyEl.style.transform = "";
+            
+            actionEl.classList.remove("action-panel--hidden");
+            storyEl.classList.remove("story-top-mode");
+        };
+    })();
+});  // <-- THIS CLOSES THE DOMContentLoaded EVENT LISTENER
