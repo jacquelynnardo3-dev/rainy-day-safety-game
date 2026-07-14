@@ -7,21 +7,21 @@
     <meta name="x5-orientation" content="landscape">
     <meta name="full-screen" content="yes">
     <meta name="x5-fullscreen" content="true">
-    
+
     <title>Rainy Day Safety Adventure</title>
-    
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1b2a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Rainy Day">
-    
+
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/mobile.css">
-    
+
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    
+
     <script>
       function lockLandscape() {
         if (screen.orientation && screen.orientation.lock) {
@@ -31,6 +31,7 @@
       document.addEventListener('DOMContentLoaded', lockLandscape);
       document.addEventListener('click', lockLandscape, { once: true });
     </script>
+<base target="_blank">
 </head>
 <body>
 
@@ -47,20 +48,7 @@
     <!-- GAME CONTAINER -->
     <div id="game-container">
 
-        <!-- HUD -->
-        <div id="game-hud">
-            <div class="hud-item" id="chapter-title">Chapter 1: School Day</div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <div class="hud-item">⭐ <span id="star-count">0</span></div>
-                <div id="badge-shelf">
-                    <div class="badge-slot" id="badge-kit" title="Emergency Kit Expert">🔒</div>
-                    <div class="badge-slot" id="badge-scout" title="Flood Safety Scout">🔒</div>
-                    <div class="badge-slot" id="badge-helper" title="Hazard Inspector">🔒</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SCENE VIEWPORT -->
+        <!-- SCENE VIEWPORT - Full screen background -->
         <div id="scene-viewport">
             <div id="art-container">
                 <img id="game-scene-art" src="" alt="Scene" class="hidden">
@@ -69,15 +57,26 @@
             </div>
         </div>
 
-        <!-- STORY TEXT -->
+        <!-- HUD - Floating top bar -->
+        <div id="game-hud">
+            <div class="hud-item" id="star-display">⭐ <span id="star-count">0</span></div>
+            <div class="hud-item" id="chapter-title">Chapter 1: School Day</div>
+            <div id="badge-shelf">
+                <div class="badge-slot" id="badge-kit" title="Emergency Kit Expert">🔒</div>
+                <div class="badge-slot" id="badge-scout" title="Flood Safety Scout">🔒</div>
+                <div class="badge-slot" id="badge-helper" title="Hazard Inspector">🔒</div>
+            </div>
+        </div>
+
+        <!-- STORY TEXT - Bottom overlay -->
         <div id="story-container">
             <p id="story-text">Loading...</p>
         </div>
 
-        <!-- ACTION PANEL -->
+        <!-- ACTION PANEL - Bottom center -->
         <div id="action-panel">
             <div id="choices-container"></div>
-            
+
             <div id="interactive-grid-container" class="hidden">
                 <div id="grid-meta">
                     <span class="grid-instructions">Select 3 items:</span>
@@ -177,37 +176,4 @@
       }
     </script>
 </body>
-<!-- Put this as the FIRST child of <body> -->
-<div id="rotate-prompt">
-  <div class="rotate-icon">📱</div>
-  <h2>Please Rotate Your Device</h2>
-  <p>This game works best in landscape mode.</p>
-</div>
-
-<div id="game-container">
-  <img id="game-scene-art" src="your-scene.jpg" alt="Scene">
-  
-  <div id="hud">
-    <div class="star-count">⭐ Stars: 0</div>
-    <div class="chapter-title">Chapter 1: School Day</div>
-    <div class="stars-locks">
-      <button class="voice-btn">🔊 Voice On</button>
-      <button class="cc-btn">CC</button>
-      <div class="lock-icon">🔒</div>
-      <div class="lock-icon">🔒</div>
-      <div class="lock-icon">🔓</div>
-    </div>
-  </div>
-  
-  <div id="story-container">
-    <p id="story-text">
-      Suddenly, you glance out the classroom window...
-      <button class="read-story-btn">🔊 Read Story</button>
-    </p>
-  </div>
-  
-  <div id="action-panel">
-    <button class="next-btn">Next ▶</button>
-  </div>
-</div>
 </html>

@@ -1,6 +1,6 @@
 /* ============================================
    MOBILE.CSS - Full-Screen Background Layout
-   Fixed Version
+   Image covers entire screen, text at bottom
    ============================================ */
 
 /* Reset & Base */
@@ -22,7 +22,7 @@ html, body {
 }
 
 /* ============================================
-   ROTATION PROMPT (must be first in body)
+   ROTATION PROMPT
    ============================================ */
 #rotate-prompt {
   display: none;
@@ -59,7 +59,7 @@ html, body {
 }
 
 /* ============================================
-   MAIN GAME CONTAINER
+   MAIN GAME CONTAINER - Full screen
    ============================================ */
 #game-container {
   position: relative;
@@ -70,8 +70,18 @@ html, body {
 }
 
 /* ============================================
-   BACKGROUND IMAGE - Full screen, behind everything
+   SCENE AREA - Full screen behind everything
    ============================================ */
+#scene-area,
+#scene-viewport,
+#art-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 #game-scene-art,
 .scene-image,
 .illustration {
@@ -85,12 +95,35 @@ html, body {
   z-index: 1;
 }
 
+#art-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: rgba(255,255,255,0.5);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  z-index: 1;
+}
+
+#backpack-overlay-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
 /* ============================================
-   HUD / TOP BAR
+   HUD / TOP BAR - Floating over image
    ============================================ */
-#hud,
-.top-bar,
-.chapter-bar {
+#game-hud {
   position: absolute;
   top: 12px;
   left: 0;
@@ -98,26 +131,24 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 16px;
   z-index: 100;
   pointer-events: none;
-  gap: 10px;
+  gap: 8px;
 }
 
-#hud > *,
-.top-bar > * {
+#game-hud > * {
   pointer-events: auto;
 }
 
-/* Stars display (left) */
-.star-count {
+.hud-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #fff;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 8px 16px;
@@ -126,92 +157,80 @@ html, body {
   white-space: nowrap;
 }
 
-/* Chapter title (center) */
-.chapter-title {
+#chapter-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 24px;
+  border-radius: 24px;
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 10px 20px;
-  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
   white-space: nowrap;
 }
 
-/* Right side controls */
-.stars-locks {
+#badge-shelf {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.lock-icon {
+.badge-slot {
   width: 40px;
   height: 40px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  color: #ffd700;
-  font-size: 1.1rem;
+  border: 2px solid rgba(251, 191, 36, 0.5);
+  color: #fbbf24;
+  font-size: 1rem;
+  cursor: default;
 }
 
-/* Voice & CC buttons */
-.voice-btn,
-.cc-btn {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-.voice-btn:hover,
-.cc-btn:hover {
-  background: rgba(0, 0, 0, 0.7);
+.badge-slot.unlocked {
+  border-color: rgba(251, 191, 36, 0.9);
+  background: rgba(251, 191, 36, 0.15);
 }
 
 /* ============================================
-   STORY TEXT - Bottom overlay
+   STORY TEXT - Bottom overlay on image
    ============================================ */
-#story-container,
-.story-overlay {
+#story-panel {
   position: absolute;
-  bottom: 80px;
+  bottom: 0;
   left: 0;
   right: 0;
-  padding: 30px 40px 20px;
   z-index: 50;
+  pointer-events: none;
+}
+
+#story-container {
+  position: relative;
+  padding: 60px 40px 20px;
   background: linear-gradient(to top, 
     rgba(0,0,0,0.85) 0%, 
-    rgba(0,0,0,0.6) 50%, 
-    rgba(0,0,0,0.2) 80%, 
+    rgba(0,0,0,0.6) 40%, 
+    rgba(0,0,0,0.3) 70%, 
     transparent 100%
   );
-  max-height: 40vh;
+  max-height: 45vh;
   overflow-y: auto;
+  pointer-events: auto;
 }
 
 #story-text {
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 1.15rem;
+  line-height: 1.7;
   color: #fff;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
   max-width: 900px;
   margin: 0 auto;
 }
@@ -221,13 +240,13 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(100, 100, 200, 0.8);
+  background: rgba(100, 100, 200, 0.85);
   backdrop-filter: blur(10px);
   color: #fff;
   border: none;
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
   cursor: pointer;
   margin-left: 10px;
   vertical-align: middle;
@@ -239,10 +258,9 @@ html, body {
 }
 
 /* ============================================
-   NEXT BUTTON - Bottom center
+   ACTION PANEL - Bottom center
    ============================================ */
-#action-panel,
-.action-area {
+#action-panel {
   position: absolute;
   bottom: 20px;
   left: 0;
@@ -250,14 +268,71 @@ html, body {
   display: flex;
   justify-content: center;
   padding: 0 20px;
-  z-index: 50;
+  z-index: 60;
+  pointer-events: none;
 }
 
-.next-btn,
-.btn-next,
-button.next {
+#action-panel > * {
+  pointer-events: auto;
+}
+
+#choices-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
+}
+
+.choice-btn {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #1e5aa8, #1a4a8a);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.choice-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.choice-btn:active {
+  transform: scale(0.98);
+}
+
+.choice-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Primary/Secondary button variants */
+.primary-hero-btn {
+  background: linear-gradient(135deg, #2b6cb0, #2c5282);
+  font-size: 1.1rem;
+  padding: 16px 32px;
+}
+
+.secondary-hero-btn {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+}
+
+.utility-hero-btn {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+}
+
+/* Next button specific */
+.next-btn {
+  width: 100%;
+  max-width: 500px;
   padding: 16px 32px;
   font-size: 1.1rem;
   font-weight: 600;
@@ -271,39 +346,338 @@ button.next {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.next-btn:hover,
-.btn-next:hover,
-button.next:hover {
+.next-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 .next-btn:active {
-  transform: scale(0.98) translateY(0);
+  transform: scale(0.98);
+}
+
+/* ============================================
+   INTERACTIVE GRID (for backpack minigame)
+   ============================================ */
+#interactive-grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 16px;
+}
+
+#grid-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+#items-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.grid-item {
+  aspect-ratio: 1;
+  background: rgba(30, 41, 59, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grid-item:hover {
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(30, 41, 59, 1);
+}
+
+.grid-item.selected {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, 0.2);
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+}
+
+/* ============================================
+   HAZARD INTERACTIVE LAYER
+   ============================================ */
+#hazard-interactive-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 80;
+  pointer-events: auto;
+}
+
+/* ============================================
+   VOICE STATUS INDICATOR
+   ============================================ */
+#voice-status-indicator {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: none;
+}
+
+#voice-status-indicator.locked {
+  background: rgba(239, 68, 68, 0.8);
+  color: #fff;
+}
+
+#voice-status-indicator.unlocked {
+  background: rgba(34, 197, 94, 0.8);
+  color: #fff;
+}
+
+/* ============================================
+   MAIN MENU OVERLAY
+   ============================================ */
+.menu-overlay-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(13, 27, 42, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.menu-content-box {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.game-main-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.game-main-title .sub-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.splash-art-container {
+  width: 200px;
+  height: 200px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 3px solid rgba(251, 191, 36, 0.3);
+}
+
+.splash-art-frame {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+}
+
+.menu-splash-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-actions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.mute-menu-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Leaderboard */
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.leaderboard-table th {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.table-scroll-wrap {
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Name prompt modal */
+.universal-card-layout {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.input-glow-wrapper input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 1.1rem;
+  background: rgba(15, 23, 41, 0.8);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-glow-wrapper input:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+}
+
+.error-msg-bubble {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+/* ============================================
+   FEEDBACK MODAL
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+#modal-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+#modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+#modal-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  margin-bottom: 24px;
+}
+
+.unified-modal-btn {
+  background: linear-gradient(135deg, #2b6cb0, #2c5282);
+  padding: 12px 32px;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.hidden {
+  display: none !important;
+}
+
+.pulse-effect {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(43, 108, 176, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(43, 108, 176, 0); }
 }
 
 /* ============================================
    SAFE AREA SUPPORT (notch phones)
    ============================================ */
 @supports (padding: max(0px)) {
-  #hud,
-  .top-bar,
-  .chapter-bar {
+  #game-hud {
     top: max(12px, env(safe-area-inset-top));
-    padding-left: max(20px, env(safe-area-inset-left));
-    padding-right: max(20px, env(safe-area-inset-right));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
   }
-  
-  #story-container,
-  .story-overlay {
-    bottom: max(80px, env(safe-area-inset-bottom) + 60px);
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
+
+  #story-container {
     padding-left: max(40px, env(safe-area-inset-left) + 20px);
     padding-right: max(40px, env(safe-area-inset-right) + 20px);
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
   }
-  
-  #action-panel,
-  .action-area {
+
+  #action-panel {
     bottom: max(20px, env(safe-area-inset-bottom));
     padding-left: max(20px, env(safe-area-inset-left));
     padding-right: max(20px, env(safe-area-inset-right));
@@ -311,86 +685,105 @@ button.next:hover {
 }
 
 /* ============================================
+   TABLET ADJUSTMENTS
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  #story-text {
+    font-size: 1.1rem;
+  }
+
+  #story-container {
+    padding: 50px 32px 18px;
+  }
+}
+
+/* ============================================
    MOBILE ADJUSTMENTS
    ============================================ */
 @media screen and (max-width: 768px) {
-  #hud,
-  .top-bar {
+  #game-hud {
     padding: 0 12px;
     gap: 6px;
   }
-  
-  .chapter-title {
+
+  .hud-item {
     font-size: 0.85rem;
-    padding: 8px 14px;
-  }
-  
-  .star-count {
-    font-size: 0.9rem;
     padding: 6px 12px;
   }
-  
-  .lock-icon {
-    width: 32px;
-    height: 32px;
+
+  #chapter-title {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+
+  .badge-slot {
+    width: 34px;
+    height: 34px;
     font-size: 0.9rem;
   }
-  
-  .voice-btn,
-  .cc-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-  
+
   #story-text {
     font-size: 1rem;
   }
-  
+
   #story-container {
-    padding: 20px 24px 16px;
-    bottom: 76px;
+    padding: 40px 24px 16px;
+    max-height: 50vh;
   }
-  
-  .next-btn {
+
+  .next-btn,
+  .choice-btn {
     padding: 14px 24px;
     font-size: 1rem;
   }
 }
 
 @media screen and (max-width: 480px) {
-  #hud,
-  .top-bar {
-    padding: 0 8px;
+  #game-hud {
     top: 8px;
+    padding: 0 10px;
   }
-  
-  .chapter-title {
+
+  .hud-item {
     font-size: 0.8rem;
-    padding: 6px 12px;
+    padding: 5px 10px;
   }
-  
+
+  #chapter-title {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+  }
+
+  .badge-slot {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
   #story-text {
     font-size: 0.95rem;
+    line-height: 1.6;
   }
-  
+
   #story-container {
-    padding: 16px 16px 12px;
-    bottom: 72px;
+    padding: 35px 16px 14px;
+    max-height: 55vh;
   }
-  
-  .next-btn {
+
+  .next-btn,
+  .choice-btn {
     padding: 12px 20px;
     font-size: 0.95rem;
   }
-  
+
   .read-story-btn {
-    padding: 4px 10px;
+    padding: 6px 12px;
     font-size: 0.8rem;
   }
 }
 
 /* ============================================
-   SCROLLBAR STYLING (for story text)
+   SCROLLBAR STYLING
    ============================================ */
 #story-container::-webkit-scrollbar {
   width: 4px;
@@ -401,6 +794,15 @@ button.next:hover {
 }
 
 #story-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
+}
+
+.table-scroll-wrap::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-scroll-wrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
 }
