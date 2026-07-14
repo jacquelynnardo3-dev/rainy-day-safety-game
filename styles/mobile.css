@@ -1,6 +1,6 @@
 /* ============================================
-   MOBILE.CSS - Full-Screen Background Layout
-   Image covers entire screen, text at bottom
+   MOBILE.CSS - Rainy Day Safety Adventure
+   Clean, centered card design with good contrast
    ============================================ */
 
 /* Reset & Base */
@@ -148,12 +148,12 @@ html, body {
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(10, 20, 40, 0.88);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 8px 16px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   white-space: nowrap;
 }
 
@@ -161,7 +161,7 @@ html, body {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(10, 20, 40, 0.88);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 10px 24px;
@@ -169,7 +169,7 @@ html, body {
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   white-space: nowrap;
 }
 
@@ -182,7 +182,7 @@ html, body {
 .badge-slot {
   width: 40px;
   height: 40px;
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(10, 20, 40, 0.88);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 50%;
@@ -216,9 +216,9 @@ html, body {
   position: relative;
   padding: 60px 40px 20px;
   background: linear-gradient(to top, 
-    rgba(135, 206, 250, 0.95) 0%, 
-    rgba(173, 216, 230, 0.80) 30%, 
-    rgba(191, 226, 245, 0.50) 60%, 
+    rgba(20, 40, 70, 0.92) 0%, 
+    rgba(20, 40, 70, 0.75) 25%, 
+    rgba(20, 40, 70, 0.40) 55%, 
     transparent 100%
   );
   max-height: 45vh;
@@ -229,9 +229,9 @@ html, body {
 #story-text {
   font-size: 1.15rem;
   line-height: 1.7;
-  color: #1a3a5c;
+  color: #ffffff;
   font-weight: 700;
-  text-shadow: 0 1px 3px rgba(255,255,255,0.6);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   max-width: 900px;
   margin: 0 auto;
 }
@@ -317,13 +317,35 @@ html, body {
 
 /* Primary/Secondary button variants */
 .primary-hero-btn {
-  background: linear-gradient(135deg, #2b6cb0, #2c5282);
+  background: linear-gradient(135deg, #34c759, #2ea34a) !important;
   font-size: 1.1rem;
   padding: 16px 32px;
+  box-shadow: 0 6px 0 #1e7e34, 0 8px 15px rgba(0,0,0,0.3) !important;
+}
+
+.primary-hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #1e7e34, 0 10px 20px rgba(0,0,0,0.4) !important;
+}
+
+.primary-hero-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #1e7e34, 0 4px 8px rgba(0,0,0,0.3) !important;
 }
 
 .secondary-hero-btn {
-  background: linear-gradient(135deg, #4a5568, #2d3748);
+  background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
+  box-shadow: 0 6px 0 #7d3c98, 0 8px 15px rgba(0,0,0,0.3) !important;
+}
+
+.secondary-hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #7d3c98, 0 10px 20px rgba(0,0,0,0.4) !important;
+}
+
+.secondary-hero-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #7d3c98, 0 4px 8px rgba(0,0,0,0.3) !important;
 }
 
 .utility-hero-btn {
@@ -451,7 +473,7 @@ html, body {
 }
 
 /* ============================================
-   MAIN MENU OVERLAY
+   MAIN MENU OVERLAY - Centered Card Design
    ============================================ */
 .menu-overlay-panel {
   position: fixed;
@@ -459,7 +481,7 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(13, 27, 42, 0.95);
+  background: rgba(85, 161, 243, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 500;
@@ -471,33 +493,43 @@ html, body {
 
 .menu-content-box {
   width: 100%;
-  max-width: 500px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   text-align: center;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 4px rgba(255,255,255,0.3);
 }
 
 .game-main-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1.2;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #1a1a2e;
+  line-height: 1.1;
+  margin-bottom: 4px;
 }
 
 .game-main-title .sub-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #fbbf24;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #f5a623;
+  display: block;
+  margin-top: 4px;
 }
 
 .splash-art-container {
-  width: 200px;
-  height: 200px;
-  border-radius: 20px;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 16/10;
+  border-radius: 16px;
   overflow: hidden;
-  border: 3px solid rgba(251, 191, 36, 0.3);
+  border: 3px dashed #a0c4ff;
+  padding: 6px;
+  background: #f0f7ff;
 }
 
 .splash-art-frame {
@@ -507,33 +539,42 @@ html, body {
   align-items: center;
   justify-content: center;
   font-size: 4rem;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .menu-splash-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 10px;
 }
 
 .menu-actions-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  max-width: 300px;
 }
 
 .mute-menu-btn {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
+  background: rgba(255,255,255,0.9);
+  border: 2px solid #e0e0e0;
+  color: #555;
   padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.mute-menu-btn:hover {
+  background: #fff;
+  border-color: #ccc;
 }
 
 /* Leaderboard */
@@ -547,12 +588,16 @@ html, body {
 .leaderboard-table td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
 .leaderboard-table th {
-  color: #fbbf24;
-  font-weight: 600;
+  color: #f5a623;
+  font-weight: 700;
+}
+
+.leaderboard-table td {
+  color: #333;
 }
 
 .table-scroll-wrap {
@@ -563,35 +608,54 @@ html, body {
 
 /* Name prompt modal */
 .universal-card-layout {
-  background: rgba(30, 41, 59, 0.9);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #ffffff;
+  border: none;
   border-radius: 20px;
   padding: 32px;
   width: 100%;
   max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.menu-panel-heading {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.menu-panel-subtext {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 20px;
 }
 
 .input-glow-wrapper input {
   width: 100%;
   padding: 14px 18px;
   font-size: 1.1rem;
-  background: rgba(15, 23, 41, 0.8);
-  border: 2px solid rgba(255,255,255,0.2);
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
   border-radius: 12px;
-  color: #fff;
+  color: #333;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-glow-wrapper input:focus {
-  border-color: #fbbf24;
-  box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+  border-color: #f5a623;
+  box-shadow: 0 0 15px rgba(245, 166, 35, 0.2);
+}
+
+.input-glow-wrapper input::placeholder {
+  color: #aaa;
 }
 
 .error-msg-bubble {
-  color: #ef4444;
+  color: #e74c3c;
   font-size: 0.9rem;
   margin-top: 8px;
+  font-weight: 600;
 }
 
 /* ============================================
@@ -603,7 +667,7 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -612,14 +676,14 @@ html, body {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #1e293b, #0f172a);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #ffffff;
+  border: none;
   border-radius: 20px;
   padding: 32px;
   max-width: 400px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
 }
 
 #modal-icon {
@@ -629,15 +693,15 @@ html, body {
 
 #modal-title {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 12px;
-  color: #fff;
+  color: #1a1a2e;
 }
 
 #modal-text {
   font-size: 1rem;
   line-height: 1.6;
-  color: #cbd5e1;
+  color: #555;
   margin-bottom: 24px;
 }
 
@@ -658,8 +722,8 @@ html, body {
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(43, 108, 176, 0.4); }
-  50% { box-shadow: 0 0 0 15px rgba(43, 108, 176, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(52, 199, 89, 0); }
 }
 
 /* ============================================
@@ -737,6 +801,23 @@ html, body {
     padding: 14px 24px;
     font-size: 1rem;
   }
+
+  .game-main-title {
+    font-size: 2.2rem;
+  }
+
+  .game-main-title .sub-title {
+    font-size: 1.3rem;
+  }
+
+  .menu-content-box {
+    padding: 24px 20px;
+    max-width: 340px;
+  }
+
+  .splash-art-container {
+    max-width: 260px;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -781,6 +862,23 @@ html, body {
     padding: 6px 12px;
     font-size: 0.8rem;
   }
+
+  .game-main-title {
+    font-size: 1.8rem;
+  }
+
+  .game-main-title .sub-title {
+    font-size: 1.1rem;
+  }
+
+  .menu-content-box {
+    padding: 20px 16px;
+    max-width: 300px;
+  }
+
+  .splash-art-container {
+    max-width: 220px;
+  }
 }
 
 /* ============================================
@@ -795,7 +893,7 @@ html, body {
 }
 
 #story-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
 }
 
@@ -804,6 +902,6 @@ html, body {
 }
 
 .table-scroll-wrap::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
