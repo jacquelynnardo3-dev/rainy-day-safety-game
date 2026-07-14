@@ -1,5 +1,6 @@
 /* ============================================
-   MOBILE.CSS - Complete Layout Fix
+   MOBILE.CSS - Full-Screen Background Layout
+   Fixed Version
    ============================================ */
 
 /* Reset & Base */
@@ -12,170 +13,16 @@
 html, body {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* prevent scrolling if it's a slide-based app */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #1a2a3a; /* your dark blue background */
-  color: #fff;
-}
-
-/* Main App Container - fills entire screen */
-.app-container,
-#app,
-main,
-.game-container {
   min-height: 100vh;
-  min-height: 100dvh; /* dynamic viewport height for mobile browsers */
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-/* ============================================
-   TOP BAR (Chapter title, stars, locks)
-   FIXED — no longer absolute, sits in normal flow
-   ============================================ */
-.top-bar,
-.header,
-.chapter-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  flex-shrink: 0; /* prevents bar from shrinking */
-  min-height: 56px;
-  z-index: 10;
-}
-
-.chapter-title {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.stars-locks {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.star-count {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.locked-levels {
-  display: flex;
-  gap: 6px;
-}
-
-.lock-icon {
-  width: 32px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-/* ============================================
-   IMAGE AREA (School hallway illustration)
-   ============================================ */
-.image-section,
-.illustration-container,
-.scene {
-  flex: 1; /* takes all available space */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 16px 16px; /* top padding for the absolute header */
-  width: 100%;
-}
-
-.scene-image,
-.illustration,
-.story-image {
-  max-width: 100%;
-  max-height: 45vh; /* limits image so it doesn't push button off screen */
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 12px;
-}
-
-/* ============================================
-   BOTTOM AREA (Next button)
-   ============================================ */
-.bottom-bar,
-.controls,
-.action-area {
-  padding: 16px 24px 32px; /* extra bottom padding for safe area */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* The Next Button */
-.next-btn,
-.btn-next,
-button.next {
-  width: 100%;
-  max-width: 400px;
-  padding: 16px 24px;
-  font-size: 18px;
-  font-weight: 600;
+  min-height: 100dvh;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0d1b2a;
   color: #fff;
-  background: linear-gradient(135deg, #2b6cb0, #2c5282);
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.next-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ============================================
-   SAFE AREA SUPPORT (notch phones)
-   ============================================ */
-@supports (padding: max(0px)) {
-  .top-bar {
-    padding-top: max(12px, env(safe-area-inset-top));
-  }
-  
-  .bottom-bar {
-    padding-bottom: max(32px, env(safe-area-inset-bottom));
-  }
-}
-
-/* ============================================
-   SMALL SCREENS
-   ============================================ */
-@media (max-height: 700px) {
-  .scene-image {
-    max-height: 38vh;
-  }
-  
-  .next-btn {
-    padding: 14px 20px;
-    font-size: 16px;
-  }
-}
-/* ============================================
-   ROTATION PROMPT - Show in portrait only
+   ROTATION PROMPT (must be first in body)
    ============================================ */
 #rotate-prompt {
   display: none;
@@ -202,7 +49,7 @@ button.next {
   50% { transform: rotate(90deg); }
 }
 
-@media screen and (orientation: portrait) {
+@media screen and (orientation: portrait) and (max-width: 768px) {
   #rotate-prompt {
     display: flex !important;
   }
@@ -210,74 +57,350 @@ button.next {
     display: none !important;
   }
 }
+
 /* ============================================
-   LANDSCAPE SPLIT LAYOUT (like your screenshot)
+   MAIN GAME CONTAINER
    ============================================ */
-@media screen and (orientation: landscape) and (max-width: 768px) {
-  #game-container {
-    display: flex;
-    flex-direction: row;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ============================================
+   BACKGROUND IMAGE - Full screen, behind everything
+   ============================================ */
+#game-scene-art,
+.scene-image,
+.illustration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 1;
+}
+
+/* ============================================
+   HUD / TOP BAR
+   ============================================ */
+#hud,
+.top-bar,
+.chapter-bar {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+  pointer-events: none;
+  gap: 10px;
+}
+
+#hud > *,
+.top-bar > * {
+  pointer-events: auto;
+}
+
+/* Stars display (left) */
+.star-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+/* Chapter title (center) */
+.chapter-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Right side controls */
+.stars-locks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lock-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #ffd700;
+  font-size: 1.1rem;
+}
+
+/* Voice & CC buttons */
+.voice-btn,
+.cc-btn {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.voice-btn:hover,
+.cc-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* ============================================
+   STORY TEXT - Bottom overlay
+   ============================================ */
+#story-container,
+.story-overlay {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  padding: 30px 40px 20px;
+  z-index: 50;
+  background: linear-gradient(to top, 
+    rgba(0,0,0,0.85) 0%, 
+    rgba(0,0,0,0.6) 50%, 
+    rgba(0,0,0,0.2) 80%, 
+    transparent 100%
+  );
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+#story-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Read Story button */
+.read-story-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(100, 100, 200, 0.8);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-left: 10px;
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+
+.read-story-btn:hover {
+  background: rgba(100, 100, 200, 1);
+}
+
+/* ============================================
+   NEXT BUTTON - Bottom center
+   ============================================ */
+#action-panel,
+.action-area {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+  z-index: 50;
+}
+
+.next-btn,
+.btn-next,
+button.next {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #2b6cb0, #2c5282);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.next-btn:hover,
+.btn-next:hover,
+button.next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.next-btn:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* ============================================
+   SAFE AREA SUPPORT (notch phones)
+   ============================================ */
+@supports (padding: max(0px)) {
+  #hud,
+  .top-bar,
+  .chapter-bar {
+    top: max(12px, env(safe-area-inset-top));
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
   }
   
-  /* Left side - illustration */
-  .scene-container,
-  .image-section {
-    flex: 1;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-  }
-  
-  .scene-image,
-  #game-scene-art {
-    max-width: 100%;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 8px;
-  }
-  
-  /* Right side - story + choices */
   #story-container,
-  .story-panel {
-    flex: 1;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 20px;
-    background: rgba(13, 27, 42, 0.95);
+  .story-overlay {
+    bottom: max(80px, env(safe-area-inset-bottom) + 60px);
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    padding-left: max(40px, env(safe-area-inset-left) + 20px);
+    padding-right: max(40px, env(safe-area-inset-right) + 20px);
+  }
+  
+  #action-panel,
+  .action-area {
+    bottom: max(20px, env(safe-area-inset-bottom));
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+  }
+}
+
+/* ============================================
+   MOBILE ADJUSTMENTS
+   ============================================ */
+@media screen and (max-width: 768px) {
+  #hud,
+  .top-bar {
+    padding: 0 12px;
+    gap: 6px;
+  }
+  
+  .chapter-title {
+    font-size: 0.85rem;
+    padding: 8px 14px;
+  }
+  
+  .star-count {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+  
+  .lock-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  .voice-btn,
+  .cc-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
   
   #story-text {
     font-size: 1rem;
-    line-height: 1.5;
-    margin-bottom: 20px;
-    color: #e67e22; /* orange text like screenshot */
   }
   
-  /* Choice buttons stack vertically */
-  #action-panel,
-  .choices {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
+  #story-container {
+    padding: 20px 24px 16px;
+    bottom: 76px;
   }
   
-  .choice-btn {
-    width: 100%;
-    padding: 14px 16px;
+  .next-btn {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #hud,
+  .top-bar {
+    padding: 0 8px;
+    top: 8px;
+  }
+  
+  .chapter-title {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  #story-text {
     font-size: 0.95rem;
-    background: #2b6cb0;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    text-align: center;
-    line-height: 1.3;
   }
+  
+  #story-container {
+    padding: 16px 16px 12px;
+    bottom: 72px;
+  }
+  
+  .next-btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+  
+  .read-story-btn {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING (for story text)
+   ============================================ */
+#story-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+#story-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#story-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
 }
