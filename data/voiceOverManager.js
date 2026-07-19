@@ -351,23 +351,38 @@ function hookUpdateUI() {
 
 
 function hookTypingAnimation() {
-    if (typeof triggerDialogueTypewriter === 'function') {
-        const originalTrigger = window.triggerDialogueTypewriter;
-        window.triggerDialogueTypewriter = function(element, textString, callback) {
-            // Voice must begin at the exact moment the typewriter is triggered.
-            voiceOver.onTypingStart(textString);
+    // Retry until triggerDialogueTypewriter is available (prevents device/timing races).
+    const maxAttempts = 40; // ~10 seconds at 250ms
+    let attempts = 0;
 
-            const wrappedCallback = () => {
-                voiceOver.onTypingComplete(textString);
-                if (callback) callback();
+    const tryHook = () => {
+        attempts++;
+
+        if (typeof window.triggerDialogueTypewriter === 'function') {
+            const originalTrigger = window.triggerDialogueTypewriter;
+            window.triggerDialogueTypewriter = function(element, textString, callback) {
+                voiceOver.onTypingStart(textString);
+
+                const wrappedCallback = () => {
+                    voiceOver.onTypingComplete(textString);
+                    if (callback) callback();
+                };
+                return originalTrigger(element, textString, wrappedCallback);
             };
-            return originalTrigger(element, textString, wrappedCallback);
-        };
+            console.log('✅ VoiceOver hooked into triggerDialogueTypewriter');
+            return;
+        }
 
-    } else {
-        setTimeout(hookTypingAnimation, 500);
-    }
+        if (attempts < maxAttempts) {
+            setTimeout(tryHook, 250);
+        } else {
+            console.warn('⚠️ VoiceOver could not hook triggerDialogueTypewriter');
+        }
+    };
+
+    tryHook();
 }
+
 
 function hookGameStart() {
     if (typeof initGame === 'function') {
