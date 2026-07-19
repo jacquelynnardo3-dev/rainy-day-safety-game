@@ -175,19 +175,7 @@ function updateUI() {
         }
     };
 
-    // Ensure voice-over starts reliably when story/choice text begins rendering.
-    // (Do not rely solely on typewriter hook timing.)
-    if (currentNode.type === "story" || currentNode.type === "choice") {
-        try {
-            if (window.voiceOver && typeof window.voiceOver.onTypingStart === 'function') {
-                // Only start speech once typing begins.
-                // voiceOverManager stops any existing speech, so calling here is safe.
-                window.voiceOver.onTypingStart(currentNode.text);
-            }
-        } catch (e) {
-            console.warn('VoiceOver start hook failed:', e);
-        }
-    }
+
 
     if (ENABLE_DIALOGUE_ANIMATION && (currentNode.type === "story" || currentNode.type === "choice" || currentNode.type === "minigame" || currentNode.type === "task")) {
         triggerDialogueTypewriter(targetStoryTextEl, currentNode.text, postRevealAction);

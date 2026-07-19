@@ -129,6 +129,13 @@ class VoiceOverManager {
 
     onTypingStart(text = null, character = null) {
         this._isTypingAnimationActive = true;
+
+        // Avoid duplicate speech triggers for the same text while typing.
+        if (text) {
+            const cleanText = this.cleanTextForSpeech(text);
+            if (this.isSpeaking && cleanText === this.lastSpokenText) return;
+        }
+
         // Cancel anything currently speaking so voice begins in sync with the new text.
         this.stop();
 
@@ -138,6 +145,7 @@ class VoiceOverManager {
             this.speak(text, character);
         }
     }
+
 
     onTypingComplete(text, character) {
         // Typing complete no longer triggers speech; speech already started at reveal.
