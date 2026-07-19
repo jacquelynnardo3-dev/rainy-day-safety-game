@@ -175,6 +175,20 @@ function updateUI() {
         }
     };
 
+    // Ensure voice-over starts reliably when story/choice text begins rendering.
+    // (Do not rely solely on typewriter hook timing.)
+    if (currentNode.type === "story" || currentNode.type === "choice") {
+        try {
+            if (window.voiceOver && typeof window.voiceOver.onTypingStart === 'function') {
+                // Only start speech once typing begins.
+                // voiceOverManager stops any existing speech, so calling here is safe.
+                window.voiceOver.onTypingStart(currentNode.text);
+            }
+        } catch (e) {
+            console.warn('VoiceOver start hook failed:', e);
+        }
+    }
+
     if (ENABLE_DIALOGUE_ANIMATION && (currentNode.type === "story" || currentNode.type === "choice" || currentNode.type === "minigame" || currentNode.type === "task")) {
         triggerDialogueTypewriter(targetStoryTextEl, currentNode.text, postRevealAction);
     } else {
@@ -757,32 +771,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (actionPanelEl && window.ResizeObserver) {
         new ResizeObserver(() => positionStoryContainer()).observe(actionPanelEl);
     }
-        // === MOBILE FIX - Override positionStoryContainer ===
-    (function() {
-        if (window.innerWidth > 768) return;
-        
-        const originalPositionStory = positionStoryContainer;
-        
-        positionStoryContainer = function() {
-            if (window.innerWidth > 768) {
-                originalPositionStory();
-                return;
-            }
-            
-            const storyEl = document.getElementById("story-container");
-            const actionEl = document.getElementById("action-panel");
-            
-            if (!storyEl || !actionEl) return;
-            
-            storyEl.style.top = "";
-            storyEl.style.bottom = "";
-            storyEl.style.position = "";
-            storyEl.style.left = "";
-            storyEl.style.right = "";
-            storyEl.style.transform = "";
-            
-            actionEl.classList.remove("action-panel--hidden");
-            storyEl.classList.remove("story-top-mode");
-        };
-    })();
+    // Layout consistency: removed the viewport-width-based override of
+    // positionStoryContainer that caused Chrome to render a different layout
+    // when window.innerWidth <= 768 (responsive/device emulation).
+    // (The base positionStoryContainer() remains in effect.)
 });  // <-- THIS CLOSES THE DOMContentLoaded EVENT LISTENER
