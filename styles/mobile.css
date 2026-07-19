@@ -756,12 +756,6 @@ html, body {
   #story-text {
     font-size: 1.1rem;
   }
-
-  #story-container {
-    padding: 50px 32px 18px;
-  }
-}
-
 /* ============================================
    MOBILE ADJUSTMENTS
    ============================================ */
@@ -792,8 +786,14 @@ html, body {
   }
 
   #story-container {
-    padding: 40px 24px 16px;
+    padding: 50px 32px 18px;
     max-height: 50vh;
+    background: linear-gradient(to top, 
+      rgba(10, 20, 60, 0.95) 0%, 
+      rgba(15, 25, 70, 0.85) 25%, 
+      rgba(20, 30, 80, 0.50) 55%, 
+      transparent 100%
+    );
   }
 
   .next-btn,
@@ -850,6 +850,12 @@ html, body {
   #story-container {
     padding: 35px 16px 14px;
     max-height: 55vh;
+    background: linear-gradient(to top, 
+      rgba(10, 20, 60, 0.95) 0%, 
+      rgba(15, 25, 70, 0.85) 25%, 
+      rgba(20, 30, 80, 0.50) 55%, 
+      transparent 100%
+    );
   }
 
   .next-btn,
@@ -878,6 +884,10 @@ html, body {
 
   .splash-art-container {
     max-width: 220px;
+  }
+}
+  #story-container {
+    padding: 50px 32px 18px;
   }
 }
 

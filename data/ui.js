@@ -76,12 +76,12 @@ function updateUI() {
 
     const artImage = document.getElementById("game-scene-art");
     const placeholder = document.getElementById("art-placeholder");
-    
+
     if (currentNode.imagePath) {
         artImage.src = currentNode.imagePath;
         artImage.classList.remove("hidden");
         if (placeholder) placeholder.classList.add("hidden");
-        
+
         artImage.onerror = () => {
             artImage.classList.add("hidden");
             if (placeholder) {
@@ -99,7 +99,7 @@ function updateUI() {
     const choicesContainer = document.getElementById("choices-container");
     const gridContainer = document.getElementById("interactive-grid-container");
     const hazardLayer = document.getElementById("hazard-interactive-layer");
-    
+
     choicesContainer.innerHTML = "";
     choicesContainer.classList.add("hidden");
     gridContainer.classList.add("hidden");
@@ -118,13 +118,16 @@ function updateUI() {
                 advanceStory();
             };
             choicesContainer.appendChild(nextBtn);
-        } else if (currentNode.type === "choice") {
+            return;
+        }
+
+        if (currentNode.type === "choice") {
             choicesContainer.classList.remove("hidden");
             currentNode.choices.forEach(choice => {
                 const btn = document.createElement("button");
                 btn.className = "choice-btn";
                 btn.innerText = choice.text;
-                
+
                 if (choice.nextId === "start") {
                     btn.onclick = () => {
                         AudioManager.playSFX('back');
@@ -140,9 +143,13 @@ function updateUI() {
                         handleChoice(choice);
                     };
                 }
+
                 choicesContainer.appendChild(btn);
             });
-        } else if (currentNode.type === "minigame") {
+            return;
+        }
+
+        if (currentNode.type === "minigame") {
             if (gameState.currentId === "hazard_game") {
                 hazardLayer.classList.remove("hidden");
                 setupHazardPlayground();
@@ -157,16 +164,25 @@ function updateUI() {
                 gridContainer.classList.remove("hidden");
                 setupItemsGrid();
             }
+            return;
+        }
+
+        if (currentNode.type === "task") {
+            choicesContainer.classList.remove("hidden");
+            if (typeof renderTaskUI === 'function') renderTaskUI();
+            else renderTaskCompleteButton();
+            return;
         }
     };
 
-    if (ENABLE_DIALOGUE_ANIMATION && (currentNode.type === "story" || currentNode.type === "choice" || currentNode.type === "minigame")) {
+    if (ENABLE_DIALOGUE_ANIMATION && (currentNode.type === "story" || currentNode.type === "choice" || currentNode.type === "minigame" || currentNode.type === "task")) {
         triggerDialogueTypewriter(targetStoryTextEl, currentNode.text, postRevealAction);
     } else {
         targetStoryTextEl.innerText = currentNode.text;
         postRevealAction();
     }
 }
+
 
 function triggerDialogueTypewriter(element, textString, callback) {
     cancelActiveTypingAnimation();
@@ -302,6 +318,108 @@ function updateGridUI() {
         itemSticker.innerText = item.icon;
         artOverlay.appendChild(itemSticker);
     });
+}
+
+function renderTaskUI() {
+    const node = storyData[gameState.currentId];
+
+    // Generic fallback
+    if (!node || !node.taskType) {
+        renderTaskCompleteButton();
+        return;
+    }
+
+    if (node.taskType === 'quick_tap') {
+        renderQuickTapTask(node);
+        return;
+    }
+
+    // TODO: implement more task types
+    renderTaskCompleteButton();
+}
+
+function renderQuickTapTask(node) {
+    // node.tapGoal (default 5)
+    const goal = node.tapGoal || 5;
+    const remaining = { count: goal };
+
+    const choicesContainer = document.getElementById("choices-container");
+    if (!choicesContainer) return;
+    choicesContainer.innerHTML = "";
+
+    const counterWrap = document.createElement('div');
+    counterWrap.style.fontWeight = 'bold';
+    counterWrap.style.color = 'var(--accent-color)';
+    counterWrap.style.marginBottom = '10px';
+    counterWrap.innerText = `Tap ${goal} times!`;
+
+    const tapBtn = document.createElement('button');
+    tapBtn.className = 'choice-btn primary-hero-btn';
+    tapBtn.innerText = '👉 Tap!';
+
+    const progressLine = document.createElement('div');
+    progressLine.style.marginTop = '8px';
+    progressLine.style.fontWeight = 'bold';
+    progressLine.style.color = '#c8e0ff';
+    progressLine.innerText = `Remaining: ${goal}`;
+
+    const update = () => {
+        progressLine.innerText = `Remaining: ${remaining.count}`;
+        if (remaining.count <= 0) {
+            choicesContainer.innerHTML = '';
+            if (node.scoreModifier) {
+                gameState.score += node.scoreModifier;
+                if (gameState.score < 0) gameState.score = 0;
+            }
+            // auto-advance
+            const doneBtn = document.createElement('button');
+            doneBtn.className = 'choice-btn primary-hero-btn';
+            doneBtn.innerText = '✅ Great job!';
+            doneBtn.onclick = () => {
+                AudioManager.playSFX('next');
+                if (node.nextId) {
+                    gameState.currentId = node.nextId;
+                    updateUI();
+                } else {
+                    advanceStory();
+                }
+            };
+            choicesContainer.appendChild(doneBtn);
+        }
+    };
+
+    tapBtn.onclick = () => {
+        if (remaining.count <= 0) return;
+        remaining.count -= 1;
+        AudioManager.playSFX('next');
+        update();
+    };
+
+    choicesContainer.appendChild(counterWrap);
+    choicesContainer.appendChild(tapBtn);
+    choicesContainer.appendChild(progressLine);
+} 
+
+
+function renderTaskCompleteButton() {
+    const choicesContainer = document.getElementById("choices-container");
+    if (!choicesContainer) return;
+    choicesContainer.innerHTML = "";
+
+    const btn = document.createElement("button");
+    btn.className = "choice-btn primary-hero-btn";
+    btn.innerText = "✅ Complete Task";
+    btn.onclick = () => {
+        AudioManager.playSFX('next');
+        const node = storyData[gameState.currentId];
+        if (node && node.nextId) {
+            gameState.currentId = node.nextId;
+            updateUI();
+        } else {
+            advanceStory();
+        }
+    };
+    choicesContainer.appendChild(btn);
 }
 
 function setupHazardPlayground() {

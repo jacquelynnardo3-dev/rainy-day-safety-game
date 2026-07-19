@@ -2,10 +2,13 @@ const storyData = {
     // ==========================================
     // CHAPTER 1: THE INITIAL CRITICAL DECISION
     // ==========================================
-    "start": {
-        type: "story",
+"start": {
+        type: "task",
         title: "Chapter 1: School Day",
-        text: "You arrive at school feeling energized! Today is Safety Day, and your friends are chatting eagerly in the hallway.",
+        text: "Quick safety tap!", 
+        taskType: "quick_tap",
+        tapGoal: 4,
+        scoreModifier: 5,
         imagePath: "assets/images/school_hallway.png",
         nextId: "morning_clouds"
     },
@@ -43,10 +46,13 @@ const storyData = {
         ]
     },
     "listen_lesson": {
-        type: "story",
+        type: "task",
         title: "Chapter 1: Safety Lesson",
-        text: "The teacher smiles. 'Great job. Now class, let's practice our skills by packing a classroom emergency kit bag before dismissal.'",
+        text: "Quick safety tap!",
         imagePath: "assets/images/supply_table.png",
+        taskType: "quick_tap",
+        tapGoal: 5,
+        scoreModifier: 10,
         nextId: "backpack_game"
     },
     "backpack_game": {
