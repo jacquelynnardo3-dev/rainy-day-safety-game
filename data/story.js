@@ -1,5 +1,5 @@
 const storyData = {
-nt    // ==========================================
+    // ==========================================
     // CHAPTER 1: THE INITIAL CRITICAL DECISION
     // ==========================================
 "start": {
@@ -7,7 +7,7 @@ nt    // ==========================================
         title: "Chapter 1: School Day",
         text: "Quick safety tap!", 
         taskType: "quick_tap",
-        tapGoal: 4,
+        tapGoal: 3,
         scoreModifier: 5,
         imagePath: "assets/images/school_hallway.png",
         nextId: "morning_clouds"
@@ -366,11 +366,18 @@ nt    // ==========================================
                 feedback: "That's the spirit! Let's hit the reset button and practice being a true safety champion."
             }
         ]
+
     },
-        type: "task",
+
     // NOTE: Chapter 5 is intentionally placed after all existing nodes.
 
+
+
+
+
     "chapter5_call_for_help": {
+
+        type: "task",
         title: "Chapter 5: Rescue Rotation",
         text: "Tap 6 times to match the rescue team’s hand-signal rhythm!",
         imagePath: "assets/images/emergency_radio_alert.png",

@@ -127,17 +127,24 @@ class VoiceOverManager {
         }
     }
 
-    onTypingStart() {
+    onTypingStart(text = null, character = null) {
         this._isTypingAnimationActive = true;
+        // Cancel anything currently speaking so voice begins in sync with the new text.
         this.stop();
-    }
 
-    onTypingComplete(text, character) {
-        this._isTypingAnimationActive = false;
+        // Start speaking immediately so it matches the moment text reveal begins.
+        // If voice is locked, speak() will set pendingText (so we don't lose sync).
         if (text && text.length > 5) {
             this.speak(text, character);
         }
     }
+
+    onTypingComplete(text, character) {
+        // Typing complete no longer triggers speech; speech already started at reveal.
+        this._isTypingAnimationActive = false;
+    }
+
+
 
     selectAllVoices() {
         const voices = this.synth.getVoices();
@@ -323,55 +330,31 @@ function addReadStoryButton() {
 }
 
 function setupTextHooks() {
-    const storyText = document.getElementById('story-text');
-    if (!storyText) {
-        setTimeout(setupTextHooks, 500);
-        return;
-    }
-    const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-            if (mutation.type === 'childList' || mutation.type === 'characterData') {
-                const newText = storyText.textContent.trim();
-                if (newText.length > 5 && newText !== voiceOver.lastSpokenText && !dialogueAnimationTracker.isAnimating) {
-                    voiceOver.speak(newText);
-                }
-            }
-        }
-    });
-    observer.observe(storyText, { childList: true, characterData: true, subtree: true });
+    // Disabled: MutationObserver-based speaking can race the typewriter animation and cause lag/desync.
+    // Speech is now triggered directly from the typewriter start hook (hookTypingAnimation).
 }
 
+
 function hookUpdateUI() {
-    if (typeof updateUI !== 'function') {
-        setTimeout(hookUpdateUI, 500);
-        return;
-    }
-    const originalUpdateUI = window.updateUI;
-    window.updateUI = function() {
-        originalUpdateUI.apply(this, arguments);
-        setTimeout(() => {
-            const el = document.getElementById('story-text');
-            if (el && !dialogueAnimationTracker.isAnimating) {
-                const text = el.textContent.trim();
-                if (text.length > 5 && text !== voiceOver.lastSpokenText) {
-                    voiceOver.speak(text);
-                }
-            }
-        }, 300);
-    };
+    // Disabled: updateUI-based delayed speaking can re-trigger speech and introduce drift.
+    // Speech is now triggered directly from the typewriter start hook (hookTypingAnimation).
 }
+
 
 function hookTypingAnimation() {
     if (typeof triggerDialogueTypewriter === 'function') {
         const originalTrigger = window.triggerDialogueTypewriter;
         window.triggerDialogueTypewriter = function(element, textString, callback) {
-            voiceOver.onTypingStart();
+            // Voice must begin at the exact moment the typewriter is triggered.
+            voiceOver.onTypingStart(textString);
+
             const wrappedCallback = () => {
                 voiceOver.onTypingComplete(textString);
                 if (callback) callback();
             };
             return originalTrigger(element, textString, wrappedCallback);
         };
+
     } else {
         setTimeout(hookTypingAnimation, 500);
     }
