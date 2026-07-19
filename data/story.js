@@ -1,5 +1,5 @@
 const storyData = {
-    // ==========================================
+nt    // ==========================================
     // CHAPTER 1: THE INITIAL CRITICAL DECISION
     // ==========================================
 "start": {
@@ -364,6 +364,130 @@ const storyData = {
                 nextId: "start",
                 scoreModifier: 0,
                 feedback: "That's the spirit! Let's hit the reset button and practice being a true safety champion."
+            }
+        ]
+    },
+        type: "task",
+    // NOTE: Chapter 5 is intentionally placed after all existing nodes.
+
+    "chapter5_call_for_help": {
+        title: "Chapter 5: Rescue Rotation",
+        text: "Tap 6 times to match the rescue team’s hand-signal rhythm!",
+        imagePath: "assets/images/emergency_radio_alert.png",
+        taskType: "quick_tap",
+        tapGoal: 6,
+        scoreModifier: 12,
+        nextId: "chapter5_role_choice"
+    },
+
+    "chapter5_role_choice": {
+        type: "choice",
+        title: "Chapter 5: Rescue Rotation",
+        text: "Rescue volunteers are coordinating supplies. Which role do you take RIGHT NOW?",
+        imagePath: "assets/images/evac_map.png",
+        choices: [
+            {
+                text: "🧭 Guide: Help people find the safest route without rushing.",
+                nextId: "chapter5_guides_minigame",
+                scoreModifier: 15,
+                feedback: "Guides keep the group together and moving the right way—safety through direction!"
+            },
+            {
+                text: "📦 Fetch: Grab and carry items from the nearest safe stash.",
+                nextId: "chapter5_fetch_minigame",
+                scoreModifier: 10,
+                feedback: "Fetchers move critical items fast. Timing matters."
+            },
+            {
+                text: "📻 Radio: Coordinate messages so rescuers don’t waste trips.",
+                nextId: "chapter5_radio_tap",
+                scoreModifier: 12,
+                requiredItem: "radio",
+                feedback: "With a radio, you can relay updates without guessing."
+            }
+        ]
+    },
+
+    "chapter5_radio_tap": {
+        type: "task",
+        title: "Chapter 5: Rescue Rotation",
+        text: "Tap 4 times to confirm the broadcast checklist!",
+        imagePath: "assets/images/emergency_radio_alert.png",
+        taskType: "quick_tap",
+        tapGoal: 4,
+        scoreModifier: 12,
+        nextId: "chapter5_tradeoff_choice"
+    },
+
+    "chapter5_guides_minigame": {
+        type: "minigame",
+        title: "Chapter 5: Rescue Rotation",
+        text: "Click exactly THREE items that help people travel safely during evacuation (no distractions!).",
+        imagePath: "assets/images/evac_center.png"
+    },
+
+    "chapter5_fetch_minigame": {
+        type: "minigame",
+        title: "Chapter 5: Rescue Rotation",
+        text: "Click exactly THREE items that would be most useful for rescue support right now.",
+        imagePath: "assets/images/supply_table.png"
+    },
+
+    "chapter5_tradeoff_choice": {
+        type: "choice",
+        title: "Chapter 5: Rescue Rotation",
+        text: "A busy crowd needs triage. Who do you help FIRST?",
+        imagePath: "assets/images/family_meeting.png",
+        choices: [
+            {
+                text: "🧤 Help the person who looks cold/unsafe first (elder or injured).",
+                nextId: "chapter5_checklist_tap",
+                scoreModifier: 18,
+                feedback: "Triage prioritizes highest immediate risk. That’s rescue thinking!"
+            },
+            {
+                text: "🎮 Help the person who asks for entertainment first.",
+                nextId: "chapter5_checklist_tap",
+                scoreModifier: -10,
+                feedback: "That feels nice, but emergencies don’t pause for distractions."
+            },
+            {
+                text: "👂 Ask a coordinator for the official triage order.",
+                nextId: "chapter5_checklist_tap",
+                scoreModifier: 14,
+                feedback: "Coordinating prevents mistakes and saves more people overall."
+            }
+        ]
+    },
+
+    "chapter5_checklist_tap": {
+        type: "task",
+        title: "Chapter 5: Rescue Rotation",
+        text: "Tap 5 times to complete the “Safe Delivery” checklist!",
+        imagePath: "assets/images/home_prep.png",
+        taskType: "quick_tap",
+        tapGoal: 5,
+        scoreModifier: 14,
+        nextId: "chapter5_final_evacuate_choice"
+    },
+
+    "chapter5_final_evacuate_choice": {
+        type: "choice",
+        title: "Chapter 5: Rescue Rotation",
+        text: "Last decision: evacuation route A or B? Choose the plan that avoids danger zones.",
+        imagePath: "assets/images/hazard_screen.png",
+        choices: [
+            {
+                text: "A) Higher-ground route with staff guidance.",
+                nextId: "victory_ending",
+                scoreModifier: 25,
+                feedback: "Correct—higher ground reduces exposure to fast-moving flood pockets."
+            },
+            {
+                text: "B) Shortcut route through low streets.",
+                nextId: "bad_reflection_ending",
+                scoreModifier: -20,
+                feedback: "Shortcutting increases risk. Flood dangers hide where water looks calm."
             }
         ]
     }
