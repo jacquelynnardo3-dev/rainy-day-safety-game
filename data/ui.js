@@ -187,7 +187,12 @@ function updateUI() {
 
 
 function triggerDialogueTypewriter(element, textString, callback) {
+
     cancelActiveTypingAnimation();
+
+    // Expose for VoiceOverManager hook (defined in voiceOverManager.js)
+    // Must be attached to window so voiceOverManager can detect it.
+    window.triggerDialogueTypewriter = triggerDialogueTypewriter;
     dialogueAnimationTracker.fullText = textString;
     dialogueAnimationTracker.currentIdx = 0;
     dialogueAnimationTracker.isAnimating = true;
@@ -224,6 +229,8 @@ function finalizeDialogueReveal(element) {
 }
 
 function skipActiveDialogueReveal() {
+    // Expose for VoiceOverManager hook/debug (safe no-op)
+
     const textEl = document.getElementById("story-text");
     if (dialogueAnimationTracker.isAnimating && textEl) {
         finalizeDialogueReveal(textEl);

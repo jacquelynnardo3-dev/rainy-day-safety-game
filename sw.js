@@ -21,7 +21,11 @@ const PRECACHE_ASSETS = [
   '/data/game.js',
   '/data/mobile-fix.js',
   // Add all your image assets here:
+  '/favicon.ico',
+  'assets/icons/icon-192.png',
+  'assets/icons/icon-512.png',
   'assets/images/school_hallway.png',
+
   'assets/images/dark_clouds.png',
   'assets/images/classroom.png',
   'assets/images/supply_table.png',
