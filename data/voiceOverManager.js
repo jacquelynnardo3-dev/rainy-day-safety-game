@@ -97,6 +97,7 @@ class VoiceOverManager {
         document.addEventListener('touchstart', unlockVoice, { capture: true, passive: true });
         document.addEventListener('touchend', unlockVoice, { capture: true, passive: true });
         document.addEventListener('keydown', unlockVoice, { capture: true, passive: true });
+
     }
 
     updateVoiceStatusUI() {
