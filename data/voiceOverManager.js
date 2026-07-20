@@ -351,37 +351,58 @@ function hookUpdateUI() {
 
 
 function hookTypingAnimation() {
-    // Retry until triggerDialogueTypewriter is available (prevents device/timing races).
-    const maxAttempts = 40; // ~10 seconds at 250ms
+    // Ensure voice hook is installed even if typewriter function was renamed/replaced.
+    const maxAttempts = 80; // ~20 seconds at 250ms
     let attempts = 0;
 
-    const tryHook = () => {
-        attempts++;
+    const installHook = () => {
+        const candidate = window.triggerDialogueTypewriter || window.triggerDialogueTypewriter; // keep for clarity
+        const typewriterFn = (typeof window.triggerDialogueTypewriter === 'function')
+            ? window.triggerDialogueTypewriter
+            : (typeof window.triggerDialogueTypewriterInternal === 'function' ? window.triggerDialogueTypewriterInternal : null);
 
-        if (typeof window.triggerDialogueTypewriter === 'function') {
-            const originalTrigger = window.triggerDialogueTypewriter;
-            window.triggerDialogueTypewriter = function(element, textString, callback) {
+        if (typeof typewriterFn === 'function') {
+            // Avoid double-wrapping
+            if (typewriterFn.__voiceOverWrapped) return true;
+
+            const originalTrigger = typewriterFn;
+            const wrapped = function(element, textString, callback) {
                 voiceOver.onTypingStart(textString);
-
                 const wrappedCallback = () => {
                     voiceOver.onTypingComplete(textString);
                     if (callback) callback();
                 };
-                return originalTrigger(element, textString, wrappedCallback);
+                return originalTrigger.call(this, element, textString, wrappedCallback);
             };
+            wrapped.__voiceOverWrapped = true;
+
+            // Put wrapped back on the expected global name
+            window.triggerDialogueTypewriter = wrapped;
+
+            // Also keep internal alias if anything else looks it up
+            window.triggerDialogueTypewriterInternal = wrapped;
+
             console.log('✅ VoiceOver hooked into triggerDialogueTypewriter');
-            return;
+            return true;
         }
+        return false;
+    };
+
+    const tryHook = () => {
+        attempts++;
+        const ok = installHook();
+        if (ok) return;
 
         if (attempts < maxAttempts) {
             setTimeout(tryHook, 250);
         } else {
-            console.warn('⚠️ VoiceOver could not hook triggerDialogueTypewriter');
+            console.warn('⚠️ VoiceOver could not hook triggerDialogueTypewriter (function not found)');
         }
     };
 
     tryHook();
 }
+
 
 
 function hookGameStart() {
